@@ -3,10 +3,7 @@ package com.zbz.bz_video.controller;
 import com.google.gson.Gson;
 import com.sun.org.apache.xpath.internal.operations.Mod;
 import com.zbz.bz_video.dao.*;
-import com.zbz.bz_video.pojo.Carousel;
-import com.zbz.bz_video.pojo.User;
-import com.zbz.bz_video.pojo.Video;
-import com.zbz.bz_video.pojo.Vtype;
+import com.zbz.bz_video.pojo.*;
 import oracle.jrockit.jfr.jdkevents.throwabletransform.ConstructorTracerWriter;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +42,8 @@ public class PageController {
     VtypeMapper vtypeMapper;
     @Resource
     CarouselMapper carouselMapper;
+    @Resource
+    UserRoleMapper userRoleMapper;
 
     @RequestMapping({"/","/index"})
     public String toIndex(Model model){
@@ -142,6 +141,9 @@ public class PageController {
         // 设置默认头像
         registerUser.setHeadImg("/image/default_headImg.png");
         userMapper.insertSelective(registerUser);
+        UserRole userRole = new UserRole();
+        userRole.setUid(registerUser.getUid());
+        userRoleMapper.insertSelective(userRole);
         return "1";
     }
 
