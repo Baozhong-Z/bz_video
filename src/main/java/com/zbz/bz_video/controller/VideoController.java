@@ -16,10 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sun.text.normalizer.UBiDiProps;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
@@ -62,13 +60,13 @@ public class VideoController {
     public JSONObject upload(MultipartFile file) throws IOException {
         //上传路径保存设置
         //获得SpringBoot当前项目的路径：System.getProperty("user.dir")
-        String path = location+"\\upload\\";
+        String path = location+"/upload/";
 
         //按照年月份进行分类：
         Calendar instance = Calendar.getInstance();
         String year = ""+instance.getWeekYear();
         String month = (instance.get(Calendar.MONTH) + 1) + "month";
-        path = path + year+"\\"+month+"\\";
+        path = path + year+"/"+month+"/";
 
         File realPath = new File(path);
         if (!realPath.exists()) {
@@ -96,7 +94,7 @@ public class VideoController {
     @ResponseBody
     public String updateCover(String base64, HttpSession session){
         //获得SpringBoot当前项目的路径：System.getProperty("user.dir")
-        String path = System.getProperty("user.dir")+"\\upload\\cover\\";
+        String path = System.getProperty("user.dir")+"/upload/cover/";
         File realPath = new File(path);
         if (!realPath.exists()) {
             boolean res = realPath.mkdirs();

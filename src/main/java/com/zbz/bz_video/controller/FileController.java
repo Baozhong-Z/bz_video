@@ -23,13 +23,13 @@ public class FileController {
         //上传路径保存设置
 
         //获得SpringBoot当前项目的路径：System.getProperty("user.dir")
-        String path = System.getProperty("user.dir")+"\\upload\\";
+        String path = System.getProperty("user.dir")+"/upload/";
 
         //按照年月份进行分类：
         Calendar instance = Calendar.getInstance();
         String year = ""+instance.getWeekYear();
         String month = (instance.get(Calendar.MONTH) + 1) + "month";
-        path = path + year+"\\"+month+"\\";
+        path = path + year+"/"+month+"/";
 
         File realPath = new File(path);
         if (!realPath.exists()) {

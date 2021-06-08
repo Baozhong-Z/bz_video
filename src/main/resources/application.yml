@@ -1,5 +1,7 @@
 server:
-  port: 9999
+  port: 80
+  tomcat:
+    connection-timeout: 9000000
 #  servlet:
 #    context-path: /bzvideo/
 
@@ -36,7 +38,7 @@ mybatis:
 my:
   accessFile:
     resourceHandler: /bv/**
-    location: E:\百度云下载
+    location: /root/download/
   druid:
     username: admin
     password: admin

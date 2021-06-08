@@ -72,7 +72,7 @@ public class UserController {
     @ResponseBody
     public String updateUserImg(String base64, HttpSession session){
         //获得SpringBoot当前项目的路径：System.getProperty("user.dir")
-        String path = System.getProperty("user.dir")+"\\upload\\headImg\\";
+        String path = System.getProperty("user.dir")+"/upload/headImg/";
         File realPath = new File(path);
         if (!realPath.exists()) {
             boolean res = realPath.mkdirs();
