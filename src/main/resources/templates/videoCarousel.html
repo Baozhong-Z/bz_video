@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>轮播图管理</title>
+    <!-- 声明移动端响应式布局-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Jquery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.5.5/css/layui.css}" media="all">
+    <script th:src="@{/layui/layui.js}"></script>
+    <!--图片上传-->
+    <link rel="stylesheet" type="text/css" th:href="@{/upload_img/css/reset.css}">
+    <script type="text/javascript" th:src="@{/upload_img/plugins/cover_js/iscroll-zoom.js}" charset="utf-8"></script>
+    <script type="text/javascript" th:src="@{/upload_img/plugins/cover_js/hammer.js}" charset="utf-8"></script>
+    <script type="text/javascript" th:src="@{/upload_img/plugins/cover_js/lrz.all.bundle.js}" charset="utf-8"></script>
+    <script type="text/javascript" th:src="@{/upload_img/plugins/cover_js/jquery.photoClip.min.js}" charset="utf-8"></script>
+    <style>
+        .carousel {
+            /* width: 80%;
+            margin: 0 auto; */
+            height: 480px;
+        }
+
+        .carousel .carousel-inner > .item > a > img {
+            display: block;
+            width: 100%;
+            height: 480px;
+            margin: 0px auto;
+        }
+
+        @media (max-width: 768px) {
+            .carousel {
+                height: 280px;
+            }
+
+            .carousel .carousel-inner > .item > a > img {
+                display: block;
+                width: 100%;
+                height: 280px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .carousel {
+                height: 180px;
+            }
+
+            .carousel .carousel-inner > .item > a > img {
+                display: block;
+                width: 100%;
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 轮播图 -->
+        <div id="carousel" class="carousel slide" data-ride="carousel">
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner" role="listbox" id="carouselShow">
+                <div class="item active">
+                    <a href="/video/14" target="_blank">
+                        <img src="https://img1.xinshuige.com/upload/vod/20201208-1/1fc9c9b431a1ec90479b8da486ddf392.jpg" alt="巨人"></a>
+                    <div class="carousel-caption">
+                        进击的巨人最终季 The Last Session
+                    </div>
+                </div>
+            </div>
+            <!-- Controls -->
+            <a class="left carousel-control" href="#carousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#carousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+        </script>
+    </div>
+
+</body>
+<div id="layer_add" style="display: none">
+    <form class="layui-form" >
+        <div class="layui-form-item">
+            <label class="layui-form-label">视频标题</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" placeholder="请输入标题" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">视频路径</label>
+            <div class="layui-input-block">
+                <input type="text" name="src" placeholder="请输入链接" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">视频封面</label>
+            <div class="layui-input-block">
+                <input type="text" name="cover" id="cover"  placeholder="请输入封面" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </form>
+    <!--===================头像上传插件start===-->
+    <div class="yc-upload-wrap">
+        <div class="yc-upload-box">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12" style="padding:0;">
+
+                        <div class="ycupload-mainbox">
+                            <div class="ycupload-main1" style="overflow:hidden;padding-left:25px;">
+                            </div>
+                            <div class="ycupload-line"></div>
+                            <div style="height:30px;"></div>
+                            <div style="min-height:1px;">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-xs-12"
+                                             style="padding-right:0;padding-left:36px;">
+                                            <!--<a href="javascript:void(0);" class="cover-uploadBtn">
+                                                    <img src="img/yc_uploadimg_06.png"/>
+                                                    <div id="clipArea"></div>
+                                                    <input type="file" id="file">
+                                                    <button id="clipBtn">截取</button>
+                                                </a>
+                                                <div id="view"></div>-->
+                                            <div style="min-height:1px;line-height:160px;text-align:center;position:relative;"
+                                                 ontouchstart="">
+                                                <div class="cover-wrap"
+                                                     style="display:none;position:fixed;left:0;top:0;width:100%;height:100%;background: rgba(0, 0, 0, 0.4);z-index: 10000000;text-align:center;">
+                                                    <div class=""
+                                                         style="width:900px;height:600px;margin:100px auto;background-color:#FFFFFF;overflow: hidden;border-radius:4px;">
+                                                        <div id="clipArea" style="margin:10px;height: 520px;"></div>
+                                                        <div class=""
+                                                             style="height:56px;line-height:36px;text-align: center;padding-top:8px;">
+                                                            <button id="clipBtn"
+                                                                    style="width:120px;height: 36px;border-radius: 4px;background-color:#ff8a00;color: #FFFFFF;font-size: 14px;text-align: center;line-height: 36px;outline: none;">
+                                                                保存封面
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="view" style="width:214px;height:160.5px;"
+                                                     title="请上传 428*321 的封面图片"></div>
+                                                <div style="height:10px;"></div>
+                                                <div class=""
+                                                     style="width:140px;height:32px;border-radius: 4px;background-color:#ff8a00;color: #FFFFFF;font-size: 14px;text-align:center;line-height:32px;outline:none;margin-left:37px;position:relative;">
+                                                    点击上传封面图
+                                                    <input type="file" id="file"
+                                                           style="cursor:pointer;opacity:0;filter:alpha(opacity=0);width:100%;height:100%;position:absolute;top:0;left:0;">
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div style="height:25px;"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!--===================头像上传插件end====-->
+</div>
+
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            url: '/admin/video/carousel/showdata',
+            //contentType: 'application/json',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [
+                [
+                    {type: "checkbox", width: 50},
+                    {field: 'id', width: 100, title: 'ID', sort: true},
+                    {field: 'src', width: 100, title: '视频路径'},
+                    {field: 'title', width: 100, title: '视频标题', sort: true},
+                    {field: 'cover', width: 200, title: '封面', sort: true},
+                    {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "left"}
+                ]
+            ],
+            limits: [5, 10, 15, 20, 25, 50],
+            limit: 15,
+            page: true,
+            skin: 'line'
+        });
+
+
+        /**
+         * toolbar监听事件
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {  // 监听添加操作
+                $("#layer_add input[name=title]").val("");
+                $("#layer_add input[name=src]").val("");
+                //$("#layer_add input[name=cover]").val("");
+                var index = layer.open({
+                    title: '添加轮播图',
+                    type: 1,
+                    shade: 0.2,
+                    maxmin: true,
+                    area: ['500px','700px'],
+                    resize: true,
+                    content: $("#layer_add"),
+                    btn: ["添加", "取消"],
+                    yes: function (index, layero) {
+                        // 添加信息
+                        $.ajax({
+                            url: "/admin/video/carousel/add",
+                            type: "post",
+                            async: false,
+                            dataType: "json",
+                            data: {
+                                src: $("#layer_add input[name=src]").val(),
+                                cover: $("#layer_add input[name=cover]").val(),
+                                title: $("#layer_add input[name=title]").val()
+                            },
+                            success: function (data) {
+                                if (data == 0) {
+                                    layer.alert("添加失败");
+                                    return false;
+                                }else {
+                                    layer.alert("添加成功");
+                                }
+                            }
+                        });
+                        layer.close(index);
+                        location.reload();
+                    },
+                    // end: function(){
+                    //     location.reload();
+                    // }
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {  // 监听删除操作
+                var checkStatus = table.checkStatus('currentTableId')
+                    , data = checkStatus.data;
+                console.log(data.length);
+                if (data.length > 0) {
+                    layer.confirm('确定删除选中吗', function (index) {
+                        var ids = [];
+                        for (var i in data) {
+                            ids.push(data[i].id);
+                        }
+                        $.ajax({
+                            url: '/admin/video/carousel/delids',
+                            type: 'POST',
+                            data: {
+                                idsJson: JSON.stringify(ids)
+                            },
+                            success: function (data) {
+                                if (data==1){
+                                    layer.msg("删除成功");
+                                    location.reload();
+                                }else {
+                                    layer.msg("删除失败");
+                                }
+
+                            }
+                        });
+                        layer.close(index);
+                    });
+                } else {
+                    layer.msg("请选择需要删除的行");
+                }
+
+            }
+        });
+
+        //监听表格复选框选择
+        // table.on('checkbox(currentTableFilter)', function (obj) {
+        //     console.log(obj)
+        // });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        url: '/admin/video/carousel/del/' + data.id,
+                        method: 'GET',
+                        success: function (data) {
+                            if (data==0){
+                                layer.alert("删除失败");
+                            }else {
+                                layer.alert("删除成功");
+                                location.reload();
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+    });
+    $(function () {
+        $.ajax({
+            url: "/admin/video/carousel/show",
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                for (i in data){
+                    var src = data[i].src;
+                    var title = data[i].title;
+                    var cover = data[i].cover;
+                    var $item = $("<div class=\"item\">\n" +
+                        "                        <a href=\""+src+"\" target=\"_blank\">\n" +
+                        "                            <img src=\""+cover+"\" alt=\"封面\"></a>\n" +
+                        "                        <div class=\"carousel-caption\">\n" +
+                        "                            "+title+"\n" +
+                        "                        </div>\n" +
+                        "                    </div>");
+                    $("#carouselShow").append($item);
+                }
+            }
+        })
+    });
+
+    //上传封面
+    //document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+    var clipArea = new bjj.PhotoClip("#clipArea", {
+        size: [480, 270],// 截取框的宽和高组成的数组。默认值为[260,260]
+        outputSize: [0, 0], // 输出图像的宽和高组成的数组。默认值为[0,0]，表示输出图像原始大小
+        //outputType: "jpg", // 指定输出图片的类型，可选 "jpg" 和 "png" 两种种类型，默认为 "jpg"
+        file: "#file", // 上传图片的<input type="file">控件的选择器或者DOM对象
+        view: "#view", // 显示截取后图像的容器的选择器或者DOM对象
+        ok: "#clipBtn", // 确认截图按钮的选择器或者DOM对象
+        loadStart: function () {
+            // 开始加载的回调函数。this指向 fileReader 对象，并将正在加载的 file 对象作为参数传入
+            $('.cover-wrap').fadeIn();
+            console.log("照片读取中");
+        },
+        loadComplete: function () {
+            // 加载完成的回调函数。this指向图片对象，并将图片地址作为参数传入
+            console.log("照片读取完成");
+        },
+        //loadError: function(event) {}, // 加载失败的回调函数。this指向 fileReader 对象，并将错误事件的 event 对象作为参数传入
+        clipFinish: function (dataURL) {
+            // 裁剪完成的回调函数。this指向图片对象，会将裁剪出的图像数据DataURL作为参数传入
+            $('.cover-wrap').fadeOut();
+            $('#view').css('background-size', '100% 100%');
+            $.ajax({
+                url: '/admin/video/carousel/updateCarousel',
+                data: {
+                    base64 : dataURL
+                },
+                async: false,
+                type: "post",
+                success: function(data) {
+                    if (data == 0) {
+                    } else {
+                        console.log(data);
+                        $("#cover").val(""+data);
+                    }
+                }
+            });
+        }
+    });
+    //clipArea.destroy();
+</script>
+</html>

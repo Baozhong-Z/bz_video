@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbz.bz_video.dao.ArticleMapper">
+
+    <select id="findById" parameterType="int" resultMap="ArticleWithUser">
+        select T.article_id, uid, article_title, content, likes, publish_time from article T where article_id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="ArticleWithUser" resultType="article">
+        select article_id, uid, article_title, CONCAT(LEFT(content, 100), '...')AS content, likes, publish_time from article
+    </select>
+
+    <resultMap id="ArticleWithUser" type="article">
+        <id property="articleId" column="article_id"/>
+        <result property="uid" column="uid"/>
+        <result property="articleTitle" column="article_title"/>
+        <result property="likes" column="likes"/>
+        <result property="publishTime" column="publish_time"/>
+        <association property="user" column="uid" javaType="user" select="com.zbz.bz_video.dao.UserMapper.selectByPrimaryKey">
+        </association>
+    </resultMap>
+</mapper>

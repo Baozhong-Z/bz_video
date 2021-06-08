@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <!-- 声明移动端响应式布局-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Jquery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+    <!-- 弹幕播放器css，js -->
+    <link href="https://cdn.jsdelivr.net/gh/hulalalalala/superVideo@1.1.7/examples/css/main-css.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/hulalalalala/superVideo@1.1.7/examples/superVideo.js"
+        type="text/javascript"></script>
+    <title th:text="${video.videoTitle}">视频</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
+    <script type="text/javascript" th:src="@{/js/common.js}"></script>
+
+    <style>
+        body {
+            /* background-image: url(../百度云下载/图片/LOL.jpg); */
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .container {
+            margin-top: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                width: 80%;
+            }
+        }
+        .side{
+            background-color: #fff;
+            /* padding: 10px 5px; */
+        }
+
+        .side>.media>.media-body>h{
+            text-overflow: ellipsis;
+        }
+
+        #main,
+        #main a {
+            background-color: white;
+            text-decoration: none;
+            color: black;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .iocn {
+            margin: 7px 5px 5px;
+        }
+
+        textarea{
+            resize: vertical;
+        }
+
+        .comment .media-body>p>a{
+            margin-left: 6px;
+        }
+
+        .comment .media-body>p.context:after{
+            content: element("<a href='#'>回复</a>");
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 导航条 -->
+    <div th:replace="~{index::nav}"></div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 col-md-9 col-sm-12 col-xs-12">
+                <div style="margin-bottom: 15px;">
+                    <h3 th:text="${video.videoTitle}" style="display: inline;margin-right: 10px"></h3>
+                    <a th:href="|/user/home/${video.uid}|" th:text="${video.user.userName}" style="margin-right: 10px"></a>
+                    <small th:text="${#dates.format(video.createTime, 'yyyy-MM-dd')}"></small>
+                </div>
+                <div id="videoContainer"></div>
+                <div id="main">
+                    <div class="pull-left iocn"><span>100</span>人正在观看</div>
+                    <div class="pull-right iocn"><a href="#"><span class="glyphicon glyphicon-share"></span>分享</a></div>
+                    <div class="pull-right iocn"><a href="#"><span class="glyphicon glyphicon-heart-empty"></span>收藏</a>
+                    </div>
+                    <div class="pull-right iocn"><a href="#"><span class="glyphicon glyphicon-thumbs-up"></span>点赞</a></div>
+                    <div class="clear"></div>
+                </div>
+    
+                <div class="panel panel-warning" style="margin-top: 20px;">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading">评论区</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-10 col-xs-12">
+                                <input type="text" id="neirongPl" class="form-control" placeholder="发表你的评论吧⬅_⬅"/>
+                            </div>
+                            <div class="col-md-2 col-xs-12">
+                                <button id="fabiaoPl" class="btn btn-success btn-block" th:onclick="|methods.publishComm(${video.vid})|"><span
+                                        class="glyphicon glyphicon-send"></span> 发布</button>
+                            </div>
+                            <div id="pinglun" class="center-block col-md-12 col-xs-12" style="margin-top: 20px;">
+                                <ul class="media-list comment">
+                                    <!--此处放评论-->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3  col-sm-12 col-xs-12 side">
+                <h4 style="color: firebrick;">热门推荐</h4>
+                <div class="media">
+                    <div class="media-left">
+                        <a href="/video/1">
+                            <img width="50px" class="media-object" src="/img/2019-04-23_211723.png" alt="影片封面">
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h5 class="media-heading">天气之子</h5>
+                        <p title="影片简介">影片简介</p>
+                    </div>
+                </div>
+                <div class="media">
+                    <div class="media-left">
+                        <a href="/video/2">
+                            <img width="50px" class="media-object" src="/img/2019-04-23_211723.png" alt="影片封面">
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h5 class="media-heading">小丑</h5>
+                        <p title="影片简介">影片简介</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <!--视频参数存放-->
+    <div style="display: none">
+        <input type="text" th:value="${video.vid}" id="vid">
+    </div>
+    <div th:replace="~{index::#footer}"></div>
+</body>
+<script>
+    function html_encode(str)
+    {
+        var s = "";
+        if (str.length == 0) return "";
+        s = str.replace(/&/g, "&gt;");
+        s = s.replace(/</g, "&lt;");
+        s = s.replace(/>/g, "&gt;");
+        s = s.replace(/ /g, "&nbsp;");
+        s = s.replace(/\'/g, "&#39;");
+        s = s.replace(/\"/g, "&quot;");
+        s = s.replace(/\n/g, "<br>");
+        return s;
+    }
+    var methods = {
+        init : function(){
+            console.log("=======init()========");
+            methods.loadComm();
+        },
+
+        loadComm : function(){
+            var vid = $("#vid").val();
+            $.ajax({
+                url: "/video/loadcomm/"+vid,
+                type: "get",
+                dataType: "json",
+                success : function (data) {
+                    console.log("========加载评论成功========");
+                    for (i in data){
+                        var uid = data[i].user.uid;
+                        var headImg = data[i].user.headImg;
+                        var username = data[i].user.userName;
+                        var content = data[i].content;
+                        content = html_encode(content);
+                        var time = data[i].createTime;
+
+                        var $single = $("" +
+                            "<li class=\"media\">\n" +
+                            "    <div class=\"media-left media-top\">\n" +
+                            "        <a href=\"/user/home/"+uid+"\">\n" +
+                            "            <img width=\"50px\" class=\"media-object img-circle\"\n" +
+                            "                src=\""+headImg+"\" alt=\"...\">\n" +
+                            "        </a>\n" +
+                            "    </div>\n" +
+                            "    <div class=\"media-body\">\n" +
+                            "        <h4 class=\"media-heading\">"+username+"</h4>\n" +
+                            "        <p class=\"context\">" + content +
+                            "        </p>\n" +
+                            "        <p><small>"+time+"</small><a href='#'>回复</a></p>\n" +
+                            "    </div>\n" +
+                            "</li>");
+                        $(".comment").append($single);
+                    }
+                }
+            });
+        },
+
+        publishComm : function (videoId) {
+            var pinglun = $("#neirongPl").val();
+            console.log("评论内容为："+pinglun);
+            $.ajax({
+                url : "/video/addcomment",
+                type: "post",
+                dataType: "json",
+                data:{
+                    vid : videoId,
+                    content : pinglun
+                },
+                success: function (data) {
+                    if (data.status == 0){
+                        alert("发表失败");
+                    }
+                    if (data.status == 1){
+                        alert("发表成功");
+                        $(".comment").empty();
+                        $("#neirongPl").val("");
+                        // 重新加载评论
+                        methods.loadComm();
+                    }
+                }
+            });
+            // $("#pinglun>ul").append('<li class="media"><div class= "media-left media-middle" ><a href="#"><img width="50px" class="media-object img-circle" src="/img/2019-04-23_211723.png" alt="..."></a></div><div class="media-body"><h4 class="media-heading">User Name</h4><p>' + pinglun + '</p></div></li>');
+            // $("#neirongPl").val("");
+        },
+
+
+    };
+
+    //tips
+    $(function () {
+        methods.init();
+        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="popover"]').popover();
+    });
+    /*弹幕播放器*/
+
+    /* 以下将定义视频插件常用的几个控件 */
+    // 实例化一个“下一个”按钮控件
+    var nextControl = new Super.NextControl();
+    // 实例化一个倍速控件
+    var Dbspeen = new Super.DbspeenControl();
+    // 实例化一个弹幕输入框控件
+    // var BarrageControl = new Super.BarrageControl();
+    // 实例化一个全屏按钮控件
+    var fullScreenControl = new Super.FullScreenControl();
+    // 实例化视频播放资源
+    var source = new Super.VideoSource({
+        // type: 视频类型 mp4:可播放浏览器支持的常见格式的视频文件(mp4/ogg/webm) m3u8: 可播放Hls形式推流直播视频(***.m3u8)
+        // src: 视频路径，可以是本地路径亦可是网络路径
+        type: 'mp4',
+        src: '[[${video.videoSrc}]]'
+    });
+
+    /* 插件的常用配置参数 */
+    var config = {
+        // 是否自动播放（该功能受限于浏览器安全策略，可能会失效，解决思路为初始化时设置为静音，加载完毕后取消静音）
+        autoplay: false,
+        currentTime: 0, // 设置视频初始播放时间，单位为秒
+        loop: false, // 是否循环播放
+        muted: false, // 是否默认静音
+        playbackRate: 1, // 视频默认播放速度
+        poster: '', // 视频首帧图片路径
+        volume: 1, // 视频默认音量 0-1
+        showPictureInPicture: true, // 是否启用画中画模式按钮（>=Chrome10有效）
+        source: source, // 为视频插件设置资源
+        // leftControls: [nextControl], // 在底部控件栏左侧插入 “下一个”按钮控件
+        rightControls: [Dbspeen, fullScreenControl], // 在底部控件栏左侧插入 “倍速” 控件和 “全屏” 控件
+        // centerControls: [BarrageControl] // 在底部控件栏中间插入 “弹幕输入控件”
+    };
+
+    //初始化插件superVideo('videoContainer')请对应好html中的插件容器id.
+    var video = new Super.Svideo('videoContainer', config);
+    // 顺便写下解决无法自动播放的思路：设置静音，视频就绪后取消静音，自动播放便可以生效（听说腾讯视频就是这么干的）
+    // video.setMuted(true) // 设置静音模式
+    /* 以下是控件类常用的监听事件 */
+
+    // 监听“下一个”按钮控件点击事件
+    nextControl.addEventListener('click', function (event) {
+        alert('click next menu !!!')
+    });
+    // 监听进入全屏模式后触发（点击进入全屏按钮）
+    fullScreenControl.addEventListener('fullscreen', function (event) {
+        console.log('is fullscreen !!!')
+    });
+    // 监听退出全屏模式后触发（点击退出全屏按钮）
+    fullScreenControl.addEventListener('cancelfullscreen', function (event) {
+        console.log('cancel fullscreen !!!')
+    });
+    // 监听发送弹幕输入框输入并发送弹幕后触发
+    BarrageControl.addEventListener('send', function (event) {
+        var value = event.target.option.value
+        console.log('send ' + value)
+    });
+
+    /* 以下是video类常用的监听事件 */
+    // 视频准备就绪
+    video.addEventListener('ready', function () {
+        console.log('is ready!')
+    });
+    // 开始播放
+    video.addEventListener('play', function () {
+        console.log('is play!')
+    });
+    // 暂停播放
+    video.addEventListener('pause', function () {
+        console.log('is pause!')
+    });
+    // 监听进入全屏模式后触发
+    video.addEventListener('fullscreen', function (event) {
+        console.log('is fullscreen !!!')
+    });
+    // 监听退出全屏模式后触发
+    video.addEventListener('cancelfullscreen', function (event) {
+        console.log('cancel fullscreen !!!')
+    });
+
+    /* 下面将演示弹幕类的用法 */
+
+    // 初始化一个弹幕实例
+    var barrage1 = new Super.Barrage('我是一条红色的超大号字体弹幕', {
+        color: 'red',
+        fontSize: 30
+    });
+    // 将该弹幕加入播放器插件
+    video.addBarrage(barrage1);
+
+    // 还可以在弹幕中插入一些dom节点
+    var vipDom = document.createElement('span');
+    vipDom.innerHTML = 'V';
+    vipDom.style.color = 'green';
+    vipDom.style.fontSize = '20px';
+    vipDom.style.fontWeight = '600';
+    vipDom.style.marginRight = '4px';
+    var barrage2 = new Super.Barrage('我是超级会员VIP', {
+        color: 'orange',
+        fontSize: 15,
+        leftDom: vipDom // 将DOM插入弹幕左侧
+    });
+    video.addBarrage(barrage2);
+
+    // 当然也可以这样简单的使用
+    video.addBarrage('冲鸭~~~~~~');
+    video.addBarrage('奥里给！！！！！！')
+
+</script>
+
+</html>

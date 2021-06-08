@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbz.bz_video.dao.UserMapper">
+
+    <select id="userLogin" parameterType="user" resultType="user">
+        select * from user where user_name=#{userName} and password=#{password}
+    </select>
+
+    <select id="findPasswordById" parameterType="int" resultType="String">
+        select password from user where uid=#{uid}
+    </select>
+
+    <delete id="removeByIds">
+        delete from user where uid in
+        <foreach collection="array" open="(" item="uid" separator="," close=")">
+            #{uid}
+        </foreach>
+    </delete>
+
+    <select id="findAllUserInfo" resultMap="userInfo">
+        select a.*,b.role_name, b.role_id from user a, role b, user_role c where a.uid=c.uid and b.role_id=c.role_id
+    </select>
+
+    <resultMap id="userInfo" type="user">
+        <id property="uid" column="uid"/>
+        <result property="userName" column="user_name"/>
+        <result property="headImg" column="head_img"/>
+        <result property="registrationTime" column="registration_time"/>
+        <result property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+    </resultMap>
+</mapper>

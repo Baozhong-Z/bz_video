@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zbz.bz_video.dao.RoleResourceMapper">
+
+    <select id="findAllRelationById" parameterType="int" resultType="int">
+        select a.rid from role_resource a where a.role_id = #{id}
+    </select>
+
+    <delete id="delRelationByIds">
+        delete from role_resource where role_id=#{roleId} and rid in
+        <foreach collection="ids" item="rid" open="(" separator="," close=")">
+            #{rid}
+        </foreach>
+    </delete>
+    
+    <insert id="addRelationByIds">
+        insert into role_resource(role_id,rid) values 
+        <foreach collection="ids" item="rid" separator=",">
+            ( #{roleId}, #{rid} )
+        </foreach>
+    </insert>
+
+    <select id="findUrlByRoleId" parameterType="int" resultType="string">
+        select b.resource from role_resource a,resource b where a.rid=b.rid and a.role_id=#{roleId}
+    </select>
+</mapper>

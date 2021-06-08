@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>BZ视频</title>
+    <meta charset="utf-8">
+    <!-- 声明移动端响应式布局-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Jquery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
+    <script type="text/javascript" th:src="@{/js/common.js}"></script>
+
+    <script>
+        $(function () {
+            $("#carousel").hover(function () {
+                $(".carousel-control").show();
+            });
+            $("#carousel").mouseleave(function () {
+                $(".carousel-control").hide();
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <!-- 导航条 -->
+    <nav class="navbar navbar-default navbar-fixed-top" th:fragment="nav">
+        <div class="container-fluid">
+
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/index"><span class="glyphicon glyphicon-home"></span> BZ视频</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="nav navbar-nav navbar-center">
+                    <li th:if="${session.currentUser == null}"><a th:href="@{/toSignIn}"><span class="glyphicon glyphicon-log-in"></span> 登录</a></li>
+                    <li th:if="${session.currentUser == null}"><a th:href="@{/toSignUp}"><span class="glyphicon glyphicon-edit"></span> 注册</a></li>
+                    <li><a href="/video/type/4">电影</a></li>
+                    <li><a href="/video/type/1">美剧</a></li>
+                    <li><a href="/video/type/2">韩剧</a></li>
+                    <li><a href="/video/type/3">日剧</a></li>
+                    <li><a th:href="@{/article/list}">专栏</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">更多<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a th:href="@{/article/list}">专栏</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li th:each="vtype:${vtypes}"><a th:href="|/video/type/${vtype.tid}|" th:text="${vtype.typeName}"></a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right" th:if="${session.currentUser != null}">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">投稿<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/video/toUpload">视频投稿</a></li>
+                            <li><a href="/article/addArticle">专栏投稿</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false"><span class="glyphicon glyphicon-user"></span> 用户中心<span
+                                class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">会员</a></li>
+                            <li><a href="#">历史记录</a></li>
+                            <li><a th:href="@{/user/homepage}">个人中心<span class="badge">0</span></a></li>
+                            <li><a href="#">收藏夹</a></li>
+                            <li role="separator" class="divider"></li>
+<!--                            <li><a th:href="@{/logout}">退出登录</a></li>-->
+                            <li><a href="/admin/login">后台管理</a></li>
+                            <li><a href="#" onclick="logout()">退出登录</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="navbar-form navbar-right" action="/video/search" method="get">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="videoName" placeholder="Search">
+                    </div>
+                    <button type="search" class="btn btn-success"><span class="glyphicon glyphicon-search"></span>
+                        搜索</button>
+                </form>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- 轮播图 -->
+    <div class="container"style="padding-left: 0px;padding-right: 0px">
+        <div id="carousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner" role="listbox">
+                <div class="item active">
+                    <a href="/video/14" target="_blank">
+                        <img src="https://img1.xinshuige.com/upload/vod/20201208-1/1fc9c9b431a1ec90479b8da486ddf392.jpg" alt="巨人"></a>
+                    <div class="carousel-caption">
+                        进击的巨人最终季 The Last Session
+                    </div>
+                </div>
+                <div class="item" th:each="carousel:${carousels}">
+                    <a th:href="${carousel.src}" target="_blank">
+                        <img th:src="${carousel.cover}" alt="封面"></a>
+                    <div class="carousel-caption" th:text="${carousel.title}"></div>
+                </div>
+            </div>
+            <!-- Controls -->
+            <a class="left carousel-control" hidden href="#carousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" hidden href="#carousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+
+
+    <!-- 最近上传 -->
+    <div class="container main">
+        <p class="head-title"><a href="#">最近上传</a></p>
+        <blockquote class="success">
+            <p>最新鲜的视频</p>
+            <footer>唐.李白</footer>
+        </blockquote>
+        <div class="row">
+            <div class="col-xs-12 col-sm-4 col-md-3 vitem" th:each="video:${allVideo}">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a th:href="|/video/${video.vid}|" target="_blank"><img class="img-responsive" th:src="${video.cover}" alt="封面"></a>
+                    </div>
+                    <div class="caption">
+                        <h4 th:text="${video.videoTitle}"></h4>
+                        <p th:text="${video.videoDes}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 最近热播 -->
+    <div class="container main">
+        <p class="head-title"><a href="/video/8">最近热播</a></p>
+        <blockquote class="success">
+            <p>床前明月光，疑是地上霜</p>
+            <footer>唐.李白</footer>
+        </blockquote>
+        <div class="row">
+            <div class="col-xs-6 col-sm-4 col-md-3 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8"><img class="img-responsive" src="/img/LOL.jpg" alt="..."></a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-3 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8"><img class="img-responsive" src="/img/t01b6396944ce64c2b9.jpg" alt="..."></a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-3 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8"><img class="img-responsive" src="/img/LOL.jpg" alt="..."></a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-3 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8"><img class="img-responsive" src="/img/t010769fafba59eb5c4.jpg" alt="..."></a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-3 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8"><img class="img-responsive" src="/img/t01b6396944ce64c2b9.jpg" alt="..."></a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-3 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8"><img class="img-responsive" src="/img/LOL.jpg" alt="..."></a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-3 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <!--                        style="background-image: url(https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg);background-position: center;width: 260.5px;height: 146.53px;">-->
+                        <a href="/video/8"><img class="img-responsive" src="/img/LOL.jpg" alt="..."></a>
+                        <!-- <img class="img-responsive center-block" src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg" alt="..."> -->
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-3 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8"><img class="img-responsive" src="/img/t010769fafba59eb5c4.jpg" alt="..."></a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 最高评分-->
+    <div class="container main">
+        <p class="head-title"><a href="#">最高评分</a></p>
+        <div class="row">
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-md-2 vitem">
+                <div class="thumbnail">
+                    <div class="thumbnail-img">
+                        <a href="/video/8">
+                            <img class="img-responsive"
+                                src="https://img1.xinshuige.com/upload/vod/20210221-1/7bf2ff887f6b9d59614c606bac6b49bd.jpg"
+                                alt="...">
+                        </a>
+                    </div>
+                    <div class="caption">
+                        <h4>电影名称</h4>
+                        <p>内容</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="container-fluid" id="footer" th:fragment="footer">
+        <p class="friendly-links">
+            "
+            商务合作邮箱：262390234张宝忠@qq.com客服电话：18234178566
+            违法和不良信息举报电话：110
+            "
+            <br>
+            "
+            投诉举报邮箱：12345678910@meituan.com
+            舞弊线索举报邮箱：314159bz@baozhong.com
+            "
+        </p>
+        <p class="zbz">
+            "友情链接"
+            <a href="http://www.bilibili.com/" target="_blank">哔哩哔哩</a>
+        </p>
+        <p>
+            "
+            ©2021
+            BZ电影 BAOZHONG.com|京ICP证160733号|京ICP备16022489号-1|京公网安备 11010102003232号|网络文化经营许可证|电子公告服务规则
+            "
+        </p>
+        <p>保中视频版权所有 © 2021-2021</p>
+    </footer>
+</body>
+
+</html>

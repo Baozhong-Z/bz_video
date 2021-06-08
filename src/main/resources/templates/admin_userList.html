@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>用户列表</title>
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.5.5/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/css/public.css}" media="all">
+    <script th:src="@{/layui/layui.js}"></script>
+
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <fieldset class="table-search-fieldset">
+        <legend>搜索信息</legend>
+        <div style="margin: 10px 10px 10px 10px">
+        <form class="layui-form layui-form-pane" action="">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">用户ID</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="id" autocomplete="off" class="layui-input"/>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">用户名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="name" autocomplete="off" class="layui-input"/>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">性别</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="sex" autocomplete="off" class="layui-input"/>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn"><i
+                            class="layui-icon"></i> 搜 索
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+        </fieldset>
+        <script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
+    </div>
+</script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+    <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">更改角色</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+</script>
+    </div>
+</div>
+</body>
+<form class="layui-form" id="layer_add" style="display: none">
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="username" required  lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-inline">
+            <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">单选框</label>
+        <div class="layui-input-block">
+            <input type="radio" name="gender" value="男" title="男">
+            <input type="radio" name="gender" value="女" title="女">
+        </div>
+    </div>
+</form>
+
+<form class="layui-form" id="role_edit" style="display: none">
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择框</label>
+        <div class="layui-inline">
+            <select name="role" lay-verify="required">
+                <option value="0"></option>
+                <option value="2">普通用户</option>
+                <option value="3">会员</option>
+                <option value="4">管理员</option>
+            </select>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            url: '/admin/userList',
+            //contentType: 'application/json',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [
+                [
+                    {type: "checkbox", width: 50},
+                    {field: 'uid', width: 100, title: 'ID', sort: true},
+                    {field: 'userName', width: 100, title: '用户名'},
+                    {field: 'gender', width: 100, title: '性别', sort: true},
+                    {field: 'birthday', width: 200, title: '生日', sort: true},
+                    {field: 'email', width: 200, title: '邮箱', sort: true},
+                    {field: 'phone', width: 200, title: '电话号码', sort: true},
+                    {field: 'registrationTime', width: 200, title: '注册时间', sort: true},
+                    {field: 'roleName', width: 150, title: '角色',align: "left"},
+                    {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "left"}
+                ]
+            ],
+            limits: [5, 10, 15, 20, 25, 50],
+            limit: 15,
+            page: true,
+            skin: 'line'
+        });
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            var result = JSON.stringify(data.field);
+            // 执行搜索重载
+            table.reload('currentTableId', {
+                url: '/admin/user/search',
+                where: {  // 设定异步数据接口的额外参数，任意设
+                    uid: data.field.id,
+                    userName: data.field.name,
+                    gender: data.field.sex
+                },
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+
+        /**
+         * toolbar监听事件
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {  // 监听添加操作
+                $("#layer_add input[name=username]").val("");
+                $("#layer_add input[name=password]").val("");
+                $("#layer_add input[name=gender]:checked").removeAttr("checked");
+                var index = layer.open({
+                    title: '添加用户',
+                    type: 1,
+                    shade: 0.2,
+                    maxmin: true,
+                    area: ['350px','300px'],
+                    resize: true,
+                    content: $("#layer_add"),
+                    btn: ["添加", "取消"],
+                    yes: function (index, layero) {
+                        // 添加用户信息
+                        $.ajax({
+                            url: "/admin/user/add",
+                            type: "post",
+                            async: false,
+                            dataType: "json",
+                            data: {
+                                userName: $("#layer_add input[name=username]").val(),
+                                password: $("#layer_add input[name=password]").val(),
+                                gender: $("#layer_add input[name=gender]:checked").val()
+                            },
+                            success: function (data) {
+                                if (data == 0) {
+                                    layer.alert("用户名已存在");
+                                    return false;
+                                }else {
+                                    layer.alert("添加成功");
+                                }
+                            }
+                        });
+                        layer.close(index);
+                        table.reload('currentTableId', {
+                            url: '/admin/userList',
+                            page: {
+                                curr: 1
+                            }
+                        });
+                    },
+                    // end: function(){
+                    //     location.reload();
+                    // }
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {  // 监听删除操作
+                var checkStatus = table.checkStatus('currentTableId')
+                    , data = checkStatus.data;
+                console.log(data.length);
+                if (data.length > 0) {
+                    layer.confirm('确定删除选中吗', function (index) {
+                        var ids = [];
+                        for (var i in data) {
+                            ids.push(data[i].uid);
+                        }
+                        $.ajax({
+                            url: '/admin/user/delbyids',
+                            type: 'POST',
+                            data: {
+                                idsJson: JSON.stringify(ids)
+                            },
+                            success: function (data) {
+                                if (data==1){
+                                    layer.msg("删除成功");
+                                    table.reload('currentTableId', {
+                                        url: '/admin/userList',
+                                        page: {
+                                            curr: 1
+                                        }
+                                    });
+                                }else {
+                                    layer.msg("删除失败");
+                                }
+
+                            }
+                        });
+                        layer.close(index);
+                    });
+                } else {
+                    layer.msg("请选择需要删除的行");
+                }
+
+            }
+        });
+
+        //监听表格复选框选择
+        // table.on('checkbox(currentTableFilter)', function (obj) {
+        //     console.log(obj)
+        // });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+
+                var index = layer.open({
+                    title: '变更角色',
+                    type: 1,
+                    shade: 0.2,
+                    maxmin: true,
+                    area: ['350px','300px'],
+                    content: $("#role_edit"),
+                    btn: ["OK", "取消"],
+                    yes: function (index, layero) {
+                        $.ajax({
+                            url: "/admin/rolemanage/edit",
+                            type: "post",
+                            data: {
+                                uid: data.uid,
+                                roleId: $("#role_edit select option:selected").val()
+                            },
+                            success: function (data) {
+                                if (data==0){
+                                    layer.msg("修改失败");
+                                }else {
+                                    layer.msg("修改成功");
+                                    table.reload('currentTableId', {
+                                        url: '/admin/userList',
+                                        page: {
+                                            curr: 1
+                                        }
+                                    });
+                                }
+                                layer.close(index);
+                            }
+                        })
+                    }
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            } else if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        url: '/admin/user/del/' + data.uid,
+                        method: 'GET',
+                        success: function (data) {
+                            if (data==0){
+                                layer.alert("删除失败");
+                            }else {
+                                layer.alert("删除成功");
+                                obj.del();
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+    });
+</script>
+</html>

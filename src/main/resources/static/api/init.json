@@ -1,0 +1,81 @@
+{
+  "homeInfo": {
+    "title": "首页",
+    "href": "/admin/welcome"
+  },
+  "logoInfo": {
+    "title": "BZ视频",
+    "image": "/images/logo.png",
+    "href": "#"
+  },
+  "menuInfo": [
+    {
+      "title": "常规管理",
+      "icon": "fa fa-address-book",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "用户管理",
+          "href": "",
+          "icon": "fa fa-home",
+          "target": "_self",
+          "child": [
+            {
+              "title": "用户管理",
+              "href": "/admin/users",
+              "icon": "fa fa-home",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "权限管理",
+          "href": "",
+          "icon": "fa fa-gears",
+          "target": "_self",
+          "child": [
+            {
+              "title": "角色管理",
+              "href": "/admin/users",
+              "icon": "fa fa-tags",
+              "target": "_self"
+            },
+            {
+              "title": "资源管理",
+              "href": "/admin/resmanage",
+              "icon": "fa fa-window-maximize",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "视频管理",
+          "href": "",
+          "icon": "fa fa-snowflake-o",
+          "target": "_self",
+          "child": [
+            {
+              "title": "视频审核",
+              "href": "/admin/video/toExamine",
+              "icon": "fa fa-snowflake-o",
+              "target": "_self"
+            },
+            {
+              "title": "平台视频管理",
+              "href": "/admin/video/tovideos",
+              "icon": "fa fa-snowflake-o",
+              "target": "_self"
+            },
+            {
+              "title": "轮播图",
+              "href": "/admin/video/carousel",
+              "icon": "fa fa-snowflake-o",
+              "target": "_self"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

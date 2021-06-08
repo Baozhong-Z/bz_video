@@ -1,0 +1,44 @@
+server:
+  port: 9999
+#  servlet:
+#    context-path: /bzvideo/
+
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/bzmovie?characterEncoding=UTF-8
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    # 配置监控统计拦截的filter。 stat：监控统计、log4j： 日志记录、 wall：防御sql注入
+    filters: stat,wall,log4j
+  servlet:
+    multipart:
+      max-file-size: 3000MB
+      max-request-size: 3000MB
+  mail:
+    username: 2623902234@qq.com
+    password: eyeuljumcnpueaed
+    host: smtp.qq.com
+    properties:
+      mail:
+        smtp:
+          ssl:
+            eable:
+              true
+  thymeleaf:
+    cache: false
+
+mybatis:
+  type-aliases-package: com.zbz.bz_video.pojo
+  mapper-locations: classpath:mappers/*.xml
+
+my:
+  accessFile:
+    resourceHandler: /bv/**
+    location: E:\百度云下载
+  druid:
+    username: admin
+    password: admin
+
+
