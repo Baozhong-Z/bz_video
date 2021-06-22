@@ -22,23 +22,23 @@ public class MyWebMvcConfig implements WebMvcConfigurer {
     @Value("${my.accessFile.location}")
     private String location;
 
-//    // Windows下配置
-//    @Override
-//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        //匹配到resourceHandler,将URL映射至location,也就是本地文件夹
-//        registry.addResourceHandler("/bv/**").addResourceLocations("file:///" + "E:/百度云下载/");
-//        registry.addResourceHandler(("/img/**")).addResourceLocations("file:///" + "E:/百度云下载/图片/");
-//        registry.addResourceHandler("/upload/**").addResourceLocations("file:"+System.getProperty("user.dir")+"/upload/");
-//    }
-
-    // Linux下配置
+    // Windows下配置
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //匹配到resourceHandler,将URL映射至location,也就是本地文件夹
-        registry.addResourceHandler("/bv/**").addResourceLocations("file:" + "/root/download/");
-        registry.addResourceHandler(("/img/**")).addResourceLocations("file:" + "/root/download/image/");
+        registry.addResourceHandler("/bv/**").addResourceLocations("file:///" + "E:/百度云下载/");
+        registry.addResourceHandler(("/img/**")).addResourceLocations("file:///" + "E:/百度云下载/图片/");
         registry.addResourceHandler("/upload/**").addResourceLocations("file:"+System.getProperty("user.dir")+"/upload/");
     }
+
+//    // Linux下配置
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        //匹配到resourceHandler,将URL映射至location,也就是本地文件夹
+//        registry.addResourceHandler("/bv/**").addResourceLocations("file:" + "/root/download/");
+//        registry.addResourceHandler(("/img/**")).addResourceLocations("file:" + "/root/download/image/");
+//        registry.addResourceHandler("/upload/**").addResourceLocations("file:"+System.getProperty("user.dir")+"/upload/");
+//    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
