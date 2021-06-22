@@ -1,14 +1,12 @@
 server:
-  port: 8888
-  tomcat:
-    connection-timeout: 9000000
+  port: 9999
 #  servlet:
 #    context-path: /bzvideo/
 
 spring:
   datasource:
     username: root
-    password: f0UjuRlH
+    password: root
     url: jdbc:mysql://localhost:3306/bzmovie?characterEncoding=UTF-8
     driver-class-name: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
@@ -38,9 +36,7 @@ mybatis:
 my:
   accessFile:
     resourceHandler: /bv/**
-    location: /root/download/
+    location: E:\百度云下载
   druid:
     username: admin
     password: admin
-
-
